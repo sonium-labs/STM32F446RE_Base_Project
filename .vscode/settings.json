@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "main.h": "c",
+        "stm32f4xx_hal.h": "c",
+        "stm32f4xx_hal_conf.h": "c",
+        "stm32f4xx_hal_rcc.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "C:\\dev\\tools\\Arm GNU Toolchain arm-none-eabi\\13.2 Rel1\\bin\\arm-none-eabi-g++.exe"
+}
