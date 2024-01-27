@@ -34,25 +34,35 @@ int main(void)
 
   while (1)
   {
-    // REGISTER ACCESS SOLUTION
+    // Register Access Solution
+    volatile uint32_t* GPIOC_IDR = (volatile uint32_t*) (0x40020810);
+    volatile uint32_t* GPIOA_ODR = (volatile uint32_t*) (0x40020014);
     // If button pressed
-    if(GPIOC->IDR & GPIO_PIN_13) {
+    if(*GPIOC_IDR & GPIO_PIN_13) {
       // Turn LED on (ACTIVE_LOW)
-      GPIOA->ODR &= ~(GPIO_PIN_5);
-    }
-    else {
+      *GPIOA_ODR &= ~(GPIO_PIN_5);
+    } else {
       // Turn LED off
-      GPIOA->ODR |= (GPIO_PIN_5);
+      *GPIOA_ODR |= (GPIO_PIN_5);
     }
     
-    // HAL SOLUTION
-    // If button pressed
+    // // CMSIS SOLUTION
+    // // If button pressed
+    // if(GPIOC->IDR & GPIO_PIN_13) {
+    //   // Turn LED on (ACTIVE_LOW)
+    //   GPIOA->ODR &= ~(GPIO_PIN_5);
+    // } else {
+    //   // Turn LED off
+    //   GPIOA->ODR |= (GPIO_PIN_5);
+    // }
+    
+    // // HAL SOLUTION
+    // // If button pressed
     // if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 1) {
     //   // Turn LED on (ACTIVE_LOW)
     //   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-    // }
-    // else {
-    // Turn LED off
+    // } else {
+    // // Turn LED off
     //   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
     // }
   }
