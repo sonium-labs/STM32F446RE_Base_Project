@@ -50,22 +50,22 @@ int main(void)
         - BaudRate = 9600 baud
         - Hardware flow control disabled (RTS and CTS signals) */
 
-    /* UART handler declaration */
+    /* UART handler declaration and definition */
     UART_HandleTypeDef uartHandle = {0};
     uartHandle.Instance          = USART2;
     uartHandle.Init.BaudRate     = 9600;
     uartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
     uartHandle.Init.StopBits     = UART_STOPBITS_1;
-    uartHandle.Init.Parity       = UART_PARITY_NONE;
+    uartHandle.Init.Parity       = UART_PARITY_ODD;
     uartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
     uartHandle.Init.Mode         = UART_MODE_TX_RX;
     uartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-      if (HAL_UART_Init(&uartHandle) != HAL_OK)
-  {
-    Error_Handler();
-  }
+    if (HAL_UART_Init(&uartHandle) != HAL_OK)   // Note this calls HAL_UART_MspInit() in \Core\Src\stm32f4xx_hal_msp.c
+    {                                           // which configures the correct GPIO to alternative mode.
+        Error_Handler();                        // For them, the alt mode is USART2!
+    }
 
-    char buf[8] = "TEST\n";
+    char buf[8] = "MIKU\n";
 
     while (1)   
     { 
