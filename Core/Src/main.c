@@ -65,7 +65,7 @@ int main(void)
     Error_Handler();
   }
 
-    char buf[8] = "BEST\n";
+    char buf[8] = "TEST\n";
 
     while (1)   
     { 
