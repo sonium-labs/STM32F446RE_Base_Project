@@ -52,29 +52,56 @@ int main(void)
 
     /* UART handler declaration and definition */
     UART_HandleTypeDef uartHandle = {0};
-    uartHandle.Instance          = USART2;
-    uartHandle.Init.BaudRate     = 9600;
-    uartHandle.Init.WordLength   = UART_WORDLENGTH_8B;  
-    uartHandle.Init.StopBits     = UART_STOPBITS_1;
-    uartHandle.Init.Parity       = UART_PARITY_NONE;    // STM32 Quirk: If you want to use a parity bit, the word length must be 9
-    uartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-    uartHandle.Init.Mode         = UART_MODE_TX_RX;
-    uartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
+    uartHandle.Instance          = USART2;                  // Must call out which UART peripheral you want to target
+                                                            // USART can do UART stuff, but also S for Synchronous stuff (dont worry bout that no one uses true USART)
+    uartHandle.Init.BaudRate     = 9600;                    // Baud or bits/second rate
+    uartHandle.Init.WordLength   = UART_WORDLENGTH_8B;      // Choose number of data bits (8 or 9)
+    uartHandle.Init.StopBits     = UART_STOPBITS_1;         // Choose number of stop bits (1 or 2)
+    uartHandle.Init.Parity       = UART_PARITY_NONE;        // STM32 Quirk: If you want to use a parity bit, the word length must be 9
+    uartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;     // Enable/disable flow control (message handshaking, read about CTS/RTS)
+    uartHandle.Init.Mode         = UART_MODE_TX_RX;         // Transceiver (Tx and Rx), Transmitter (Tx), or Receiver (RX)?
+    uartHandle.Init.OverSampling = UART_OVERSAMPLING_16;    // Turn on oversampling to reduce effect of noise (can set to 8 safely with the short cable we have)
     if (HAL_UART_Init(&uartHandle) != HAL_OK)   // Note this calls HAL_UART_MspInit() in \Core\Src\stm32f4xx_hal_msp.c
-    {                                           // which configures the correct GPIO to alternative mode.
-        Error_Handler();                        // for them, the alt mode is USART2!
+    {                                           // which configures the correct GPIO (A2 and A3) to alternative mode.
+        Error_Handler();                        // For them, the alt modes are USART2 Tx and Rx.
     }
 
-    char buf[8] = "MIKU\n";
+    char buf;
+    char miku[6] = "MIKU\r\n";      // \r\n is a line separator, \r is carriage return and \n is newline
+    char msgA[16] = "I Love A\r\n"; // https://en.wikipedia.org/wiki/Newline
+    char msgB[16] = "I Love B\r\n";
 
-    while (1)   
-    { 
-        HAL_UART_Transmit(&uartHandle, buf, sizeof(buf), HAL_MAX_DELAY);
-        HAL_Delay(1000);
+    while (1)
+    {
+        // Demo of delaying UART transmits ///////////////////
+        // Arrays are pointers in C so we can pass it in without dereferencing it with &
+        // HAL_UART_Transmit(&uartHandle, miku, sizeof(miku), HAL_MAX_DELAY); // Send chars in buffer to transmit out through USART2
+        // HAL_Delay(1000); // Delay for 1000ms/1s
+        //////////////////////////////////////////////////////
+        // btw you can highlight blocks/lines and use `Ctrl + /` to (un)comment
+
+        // Demo of echo functionality (tx everything received in rx/parrot it back) ////////////////////
+        // As well as an example of how you might use a switch statement to do different things based on received character
+        // "buf" is a char type, we deference it using & to send its address to the function which uses that address as a pointer value internally
+        if(HAL_UART_Receive(&uartHandle, &buf, sizeof(buf), HAL_MAX_DELAY) == HAL_OK) {
+            HAL_UART_Transmit(&uartHandle, &buf, sizeof(buf), HAL_MAX_DELAY); // Echo functionality
+
+            switch(buf) {
+                case 'A':
+                    HAL_UART_Transmit(&uartHandle, msgA, sizeof(msgA), HAL_MAX_DELAY);
+                    break;
+                case 'B':
+                    HAL_UART_Transmit(&uartHandle, msgB, sizeof(msgB), HAL_MAX_DELAY);
+                    break;
+                default:
+                    break;
+            }
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }
 
-// ARRRRRG... BELOW HERE THERE BE AUTO-GENERATED CODE, YOU CAN IGNORE IT FOR NOW
+// ARRRRRG... BELOW HERE THERE BE AUTO-GENERATED CODE
 
 /**
  * @brief System Clock Configuration
